@@ -47,5 +47,47 @@ namespace TestBankProject
 			bank.UjSzamla("Teszt Elek", "1234");
 			Assert.That(bank.Egyenleg("1234"), Is.Zero);
 		}
+
+		[Test]
+		public void Egyenleg_NullSzamlaszam_ArgumentNullException()
+		{
+			bank.UjSzamla("Teszt Elek", "1234");
+
+			Assert.Throws<ArgumentNullException>(() =>  bank.Egyenleg(null));
+		}
+
+
+		[Test]
+		public void Egyenleg_UresSzamlaszam_ArgumentException()
+		{
+			bank.UjSzamla("Teszt Elek", "1234");
+
+			Assert.Throws<ArgumentException>(() => bank.Egyenleg(""));
+		}
+
+		[Test]
+		public void Egyenleg_BetuASzamlaszamban_ArgumentException()
+		{
+			bank.UjSzamla("Teszt Elek", "1234");
+
+			Assert.Throws<ArgumentException>(() => bank.Egyenleg("abcd"));
+		}
+
+		[Test]
+		public void Egyenleg_NemLetezoSzamlaszam_HibasSzamlaszamException()
+		{
+			bank.UjSzamla("Teszt Elek", "1234");
+
+			Assert.Throws<HibasSzamlaszamException>(() => bank.Egyenleg("9876"));
+		}
+
+		[Test]
+		public void Egyenleg_ErvenyesSzamlaszammal_NemDobKivetelt()
+		{
+			bank.UjSzamla("Teszt Elek", "1234-5678");
+
+			Assert.DoesNotThrow(() => bank.Egyenleg("1234-5678"));
+		}
+
 	}
 }

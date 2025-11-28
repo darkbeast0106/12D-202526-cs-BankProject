@@ -1,4 +1,6 @@
-﻿namespace BankProject
+﻿using System.Text.RegularExpressions;
+
+namespace BankProject
 {
     /// <summary>
     /// Bank műveleteit végrehajtó osztály.
@@ -49,23 +51,62 @@
         /// <param name="szamlaszam">A számla számlaszáma, aminek az egyenlegét keressük</param>
         /// <returns>A számlán lévő egyenleg</returns>
         /// <exception cref="ArgumentNullException">A számlaszám nem lehet null</exception>
-        /// <exception cref="ArgumentException">A számlaszám számot, szóközt és kötőjelet tartalmazhat</exception>
+        /// <exception cref="ArgumentException">A számlaszám nem lehet üres és csak számot, szóközt és kötőjelet tartalmazhat</exception>
         /// <exception cref="HibasSzamlaszamException">A megadott számlaszámmal nem létezik számla</exception>
         public ulong Egyenleg(string szamlaszam)
-        {
-            return 0;
-        }
+		{
+			if (szamlaszam == null)
+			{
+				throw new ArgumentNullException(nameof(szamlaszam));
+			}
+			if (string.IsNullOrEmpty(szamlaszam))
+			{
+				throw new ArgumentException("A számlaszám nem lehet üres", nameof(szamlaszam));
+			}
+			if (!Regex.IsMatch(szamlaszam, "^[\\d\\-\\s]*$"))
+			{
+				throw new ArgumentException("A számlaszám csak számot, szóközt és kötőjelet tartalmazhat", nameof(szamlaszam));
+			}
 
-        /// <summary>
-        /// Egy létező számlára pénzt helyez
-        /// </summary>
-        /// <param name="szamlaszam">A számla számlaszáma, amire pénzt helyez</param>
-        /// <param name="osszeg">A számlára helyezendő pénzösszeg</param>
-        /// <exception cref="ArgumentNullException">A számlaszám nem lehet null</exception>
-        /// <exception cref="ArgumentException">Az összeg csak pozitív lehet.
-        /// A számlaszám számot, szóközt és kötőjelet tartalmazhat</exception>
-        /// <exception cref="HibasSzamlaszamException">A megadott számlaszámmal nem létezik számla</exception>
-        public void EgyenlegFeltolt(string szamlaszam, ulong osszeg)
+			Szamla szamla = SzamlaKeres(szamlaszam);
+
+			return szamla.Egyenleg;
+		}
+
+		private Szamla SzamlaKeres(string szamlaszam)
+		{
+            // Keresés
+			int index = 0;
+			Szamla? szamla = null;
+			// Végigmegyünk a listán addig amíg nem találunk a megadott feltéllel elemet
+			while (index < this.szamlak.Count && this.szamlak[index].Szamlaszam != szamlaszam)
+			{
+				index++;
+			}
+			// Ha nem érünk el a lista végére, akkor létezik ilyen elem
+			if (index < this.szamlak.Count)
+			{
+				szamla = this.szamlak[index];
+			}
+
+			if (szamla == null)
+			{
+				throw new HibasSzamlaszamException(szamlaszam);
+			}
+
+			return szamla;
+		}
+
+		/// <summary>
+		/// Egy létező számlára pénzt helyez
+		/// </summary>
+		/// <param name="szamlaszam">A számla számlaszáma, amire pénzt helyez</param>
+		/// <param name="osszeg">A számlára helyezendő pénzösszeg</param>
+		/// <exception cref="ArgumentNullException">A számlaszám nem lehet null</exception>
+		/// <exception cref="ArgumentException">Az összeg csak pozitív lehet.
+		/// A számlaszám számot, szóközt és kötőjelet tartalmazhat</exception>
+		/// <exception cref="HibasSzamlaszamException">A megadott számlaszámmal nem létezik számla</exception>
+		public void EgyenlegFeltolt(string szamlaszam, ulong osszeg)
         {
             throw new NotImplementedException();
         }
