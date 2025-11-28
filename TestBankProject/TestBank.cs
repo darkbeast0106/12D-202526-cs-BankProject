@@ -89,5 +89,35 @@ namespace TestBankProject
 			Assert.DoesNotThrow(() => bank.Egyenleg("1234-5678"));
 		}
 
+		[Test]
+		public void EgyenlegFeltolt_ErvenyesErtekekkel_AzEgyenlegMegvaltozik()
+		{
+			bank.UjSzamla("Teszt Elek", "1234");
+
+			bank.EgyenlegFeltolt("1234", 10000);
+
+			Assert.That(bank.Egyenleg("1234"), Is.EqualTo(10000));
+		}
+
+		/*
+		EgyenlegFeltolt
+		- Számlaszám null - kivétel
+		- Számlaszám üres - kivétel
+		- Számlaszám szöveget tartalmaz - kivétel
+		- Számlaszám nem létezik - kivétel
+		- összeg 0 - kivétel
+		- Létezõ számlaszám, érvényes egyenleg - nem dob kivételt
+		- [Az összeg rákerül a számlára - új egyenleg = feltöltött egyenleg]
+		- Több számla esetén, az összeg a megfelelõ számlára kerül, a többi változatlan marad
+		- Többször ugyan arra a számlára töltés - Az összeg hozzáadódik nem felülírja
+		- Ugyan az a tulajdonos több számlával - megfelelõ számlára tölt
+
+		Utal
+		- kivételek: honnan/hova null, üres, szöveg, nem létezik | összeg 0
+		- Az egyenlegek megváltoznak utaláskor
+		- A számlaszámon lévõ teljes egyenleg átutalható
+		- A számlaszámon lévõ egyenlegnél nagyobb egyenleg nem utalható át - Az egyenlegek nem változnak
+		- Több számla esetén csak a megfelelõ számlák egyenlege változik
+		 */
 	}
 }
